@@ -1,6 +1,6 @@
 body {
   font-family: Inter;
-  background-color: #fedee0;
+  background-color: #f7f7e7;
   margin: 0;
   padding: 0;
 }
@@ -53,7 +53,7 @@ li span {
 
 p {
   text-align: center;
-  color: #888;
+  color: #000000;
 }
 
 ul {

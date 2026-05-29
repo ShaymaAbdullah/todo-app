@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import TaskItem from "./components/TaskItem";
 
 function App() {
   const [task, setTask] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("tasks");
+
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
 
   function addTask() {
     if (task.trim() === "") return;
@@ -30,6 +35,9 @@ function App() {
 
     setTasks(updatedTasks);
   }
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
   return (
     <div className="container">
       <h1>Todo App</h1>
@@ -46,23 +54,13 @@ function App() {
         {tasks.length === 0 && <p>No tasks yet 🚀</p>}
         <ul>
           {tasks.map((item, index) => (
-            <li key={index}>
-              <span
-                style={{
-                  textDecoration: item.completed ? "line-through" : "none",
-                }}
-              >
-                {item.text}
-              </span>
-
-              <button onClick={() => toggleComplete(index)}>
-                Done
-              </button>
-
-              <button onClick={() => deleteTask(index)}>
-                Delete
-              </button>
-            </li>
+            <TaskItem
+              key={index}
+              item={item}
+              index={index}
+              deleteTask={deleteTask}
+              toggleComplete={toggleComplete}
+            />
           ))}
         </ul>
 
