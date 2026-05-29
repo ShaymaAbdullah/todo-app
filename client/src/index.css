@@ -30,6 +30,7 @@ button {
   color: white;
   border-radius: 6px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 button:hover {
@@ -68,4 +69,14 @@ li button:first-of-type {
 
 li button:last-of-type {
   background: #A7626B
+}
+
+input:focus {
+  border-color: #333;
+}
+
+.filters {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
 }

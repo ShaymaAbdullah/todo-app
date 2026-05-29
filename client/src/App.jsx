@@ -3,6 +3,7 @@ import TaskItem from "./components/TaskItem";
 
 function App() {
   const [task, setTask] = useState("");
+  const [filter, setFilter] = useState("all");
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem("tasks");
 
@@ -35,9 +36,38 @@ function App() {
 
     setTasks(updatedTasks);
   }
+  function editTask(indexToEdit) {
+    const newText = prompt("Edit your task:");
+
+    if (!newText || newText.trim() === "") return;
+
+    const updatedTasks = tasks.map((task, index) => {
+      if (index === indexToEdit) {
+        return {
+          ...task,
+          text: newText,
+        };
+      }
+
+      return task;
+    });
+
+    setTasks(updatedTasks);
+  }
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "completed") {
+      return task.completed;
+    }
+
+    if (filter === "active") {
+      return !task.completed;
+    }
+
+    return true;
+  });
   return (
     <div className="container">
       <h1>Todo App</h1>
@@ -52,14 +82,28 @@ function App() {
 
         <button onClick={addTask}>Add</button>
         {tasks.length === 0 && <p>No tasks yet 🚀</p>}
+        <div className="filters">
+          <button onClick={() => setFilter("all")}>
+            All
+          </button>
+
+          <button onClick={() => setFilter("active")}>
+            Active
+          </button>
+
+          <button onClick={() => setFilter("completed")}>
+            Completed
+          </button>
+        </div>
         <ul>
-          {tasks.map((item, index) => (
+          {filteredTasks.map((item, index) => (
             <TaskItem
               key={index}
               item={item}
               index={index}
               deleteTask={deleteTask}
               toggleComplete={toggleComplete}
+              editTask={editTask}
             />
           ))}
         </ul>

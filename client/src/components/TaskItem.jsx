@@ -1,4 +1,4 @@
-function TaskItem({ item, index, deleteTask, toggleComplete }) {
+function TaskItem({ item, index, deleteTask, toggleComplete, editTask, }) {
     return (
         <li>
             <span
@@ -12,7 +12,9 @@ function TaskItem({ item, index, deleteTask, toggleComplete }) {
             <button onClick={() => toggleComplete(index)}>
                 Done
             </button>
-
+            <button onClick={() => editTask(index)}>
+                Edit
+            </button>
             <button onClick={() => deleteTask(index)}>
                 Delete
             </button>
