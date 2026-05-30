@@ -4,11 +4,7 @@ import TaskItem from "./components/TaskItem";
 function App() {
   const [task, setTask] = useState("");
   const [filter, setFilter] = useState("all");
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem("tasks");
-
-    return savedTasks ? JSON.parse(savedTasks) : [];
-  });
+  const [tasks, setTasks] = useState([]);
 
   async function addTask() {
     if (task.trim() === "") return;
@@ -30,37 +26,60 @@ function App() {
     setTask("");
   }
 
-  function deleteTask(indexToDelete) {
-    const updatedTasks = tasks.filter((_, index) => index !== indexToDelete);
-    setTasks(updatedTasks);
-  }
-  function toggleComplete(indexToToggle) {
-    const updatedTasks = tasks.map((task, index) => {
-      if (index === indexToToggle) {
-        return { ...task, completed: !task.completed };
-      }
-      return task;
+  async function deleteTask(id) {
+    await fetch(`http://localhost:5000/tasks/${id}`, {
+      method: "DELETE",
     });
 
-    setTasks(updatedTasks);
+    setTasks(tasks.filter((task) => task._id !== id));
   }
-  function editTask(indexToEdit) {
+  async function toggleComplete(id, completed) {
+    const response = await fetch(
+      `http://localhost:5000/tasks/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          completed: !completed,
+        }),
+      }
+    );
+
+    const updatedTask = await response.json();
+
+    setTasks(
+      tasks.map((task) =>
+        task._id === id ? updatedTask : task
+      )
+    );
+  }
+  async function editTask(id) {
     const newText = prompt("Edit your task:");
 
     if (!newText || newText.trim() === "") return;
 
-    const updatedTasks = tasks.map((task, index) => {
-      if (index === indexToEdit) {
-        return {
-          ...task,
+    const response = await fetch(
+      `http://localhost:5000/tasks/edit/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           text: newText,
-        };
+        }),
       }
+    );
 
-      return task;
-    });
+    const updatedTask = await response.json();
 
-    setTasks(updatedTasks);
+    setTasks(
+      tasks.map((task) =>
+        task._id === id ? updatedTask : task
+      )
+    );
   }
   useEffect(() => {
     async function fetchTasks() {
@@ -112,11 +131,10 @@ function App() {
           </button>
         </div>
         <ul>
-          {filteredTasks.map((item, index) => (
+          {filteredTasks.map((item) => (
             <TaskItem
-              key={index}
+              key={item._id}
               item={item}
-              index={index}
               deleteTask={deleteTask}
               toggleComplete={toggleComplete}
               editTask={editTask}
