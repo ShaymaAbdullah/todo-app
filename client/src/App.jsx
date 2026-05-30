@@ -10,15 +10,23 @@ function App() {
     return savedTasks ? JSON.parse(savedTasks) : [];
   });
 
-  function addTask() {
+  async function addTask() {
     if (task.trim() === "") return;
 
-    const newTask = {
-      text: task,
-      completed: false,
-    };
+    const response = await fetch("http://localhost:5000/tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: task,
+      }),
+    });
+
+    const newTask = await response.json();
 
     setTasks([...tasks, newTask]);
+
     setTask("");
   }
 
@@ -55,8 +63,16 @@ function App() {
     setTasks(updatedTasks);
   }
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+    async function fetchTasks() {
+      const response = await fetch("http://localhost:5000/tasks");
+
+      const data = await response.json();
+
+      setTasks(data);
+    }
+
+    fetchTasks();
+  }, []);
   const filteredTasks = tasks.filter((task) => {
     if (filter === "completed") {
       return task.completed;
